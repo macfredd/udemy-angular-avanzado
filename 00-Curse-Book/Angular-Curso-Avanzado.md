@@ -47,5 +47,185 @@ Se requieren las mismas herramientas instaladas en el curso Básico [Vew guía d
 
 <div style="page-break-after: always;"></div>
 
-## Inicio
+## Angular Cli Tests
 
+
+Durante la participación en este curso (Marzo 2024) esta es la versión del Angular Cli / Node y Angular.
+
+```bash
+[fcruz@fedora 01-clitest]$ ng version
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+    
+
+Angular CLI: 17.2.3
+Node: 20.10.0
+Package Manager: npm 10.2.3
+OS: linux x64
+
+Angular: 17.2.4
+... animations, common, compiler, compiler-cli, core, forms
+... platform-browser, platform-browser-dynamic, router
+
+Package                         Version
+---------------------------------------------------------
+@angular-devkit/architect       0.1702.3
+@angular-devkit/build-angular   17.2.3
+@angular-devkit/core            17.2.3
+@angular-devkit/schematics      17.2.3
+@angular/cli                    17.2.3
+@schematics/angular             17.2.3
+rxjs                            7.8.1
+typescript                      5.2.2
+zone.js                         0.14.4
+```
+
+
+## Comando help:
+
+**--help** podemos usarlo de forma global `ng --help` o sobre un comando específico, por ejemplo podemos obtener ayuda para el comando que genera un componente:
+
+```bash
+$ ng g c --help
+ng g component [name]
+
+Creates a new, generic component definition in the given project.
+
+Arguments:
+  name  The name of the component.                                                                                                                                                                                                   [string]
+
+Options:
+     -c, --change-detection    The change detection strategy to use in the new component.                                                                                           
+     
+     [string] [choices: "Default", "OnPush"] [default: "Default"]
+  ```
+
+NOTA: se mostrará todas las opciones, en este caso a manera de ejemplo mostramos el parámetro **-c** para especificar la estrategia de detección de cambios.
+
+A continuación se muestran las opciones completas para la versión del ***cli 17.2.3***
+
+|Option|Desc|Values|
+|-|-|-|
+|--help|Shows a help message for this command in the console.|[boolean]|
+|--interactive|Enable interactive inputprompts.|[boolean] [default: true]|
+|-d, --dry-run|Run through and reports activity without writing out results.|[boolean] [default: false]|
+|--defaults|Disable interactive input prompts for options with a default.|[boolean] [default: false]|
+|--force|Force overwriting of existing files.|[boolean] [default: false]|
+|-c, --change-detection|The change detection strategy to use in the new component. |[string] [choices: "Default", "OnPush"] [default: "Default"]|
+|-b, --display-block|Specifies if the style will contain `:host { display: block; }`.|[boolean] [default: false]|
+--export|The declaring NgModule exports this component.|[boolean] [default: false]|
+|--flat|Create the new files at the top level of the current project.|[boolean] [default: false]|
+|-s, --inline-style|Include styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.|        [boolean] [default: false]|
+|-t, --inline-template|Include template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.|                                            [boolean] [default: false]|
+|-m, --module|The declaring NgModule.|[string]|
+|-p, --prefix|The prefix to apply to the generated component selector.|[string]|
+|--project|The name of the project.|[string]|
+|--selector|The HTML selector to use for this component.|[string]|
+|--skip-import|Do not import this component into the owning NgModule.|[boolean] [default: false]|
+|--skip-selector|Specifies if the component should have a selector or not.|[boolean] [default: false]|
+|--skip-tests|Do not create "spec.ts" test files for the new component.|[boolean] [default: false]|
+|--standalone|Whether the generated component is standalone.|[boolean] [default: true]|
+|--style|The file extension or preprocessor to use for style files, or 'none' to skip generating the style file.|[string] [choices: "css", "scss", "sass", "less", "none"] [default: "css"]|
+|--type|Adds a developer-defined type to the filename, in the format "name.type.ts".|[string] [default: "Component"]|
+|-v, --view-encapsulation|The view encapsulation strategy to use in the new component.| [string] [choices: "Emulated", "None", "ShadowDom"]|
+
+
+## Primera APP
+
+```bash
+$ ng new 01-clitest --standalone false
+```
+
+<aside class="nota-informativa">
+<p> Vamos a usar la forma anterior basada en módulo. Esto lo hacemos con la opción <strong>--standalone false</strong></p>
+</aside>
+
+## Comandos básicos del Ng Cli.
+
+Podemos usar la opción **-d** la cual nos permite probar varios opciones sin aplicar cambios en el proyecto, por ejemplo: Creemos un componente home con y sin el flag  **--flat**
+
+### Agregar componente
+```bash
+$ ng g c home -d
+CREATE src/app/home/home.component.css (0 bytes)
+CREATE src/app/home/home.component.html (19 bytes)
+CREATE src/app/home/home.component.spec.ts (587 bytes)
+CREATE src/app/home/home.component.ts (191 bytes)
+UPDATE src/app/app.module.ts (467 bytes)
+```
+
+Crea el Componente en su propio directorio ./src/app/home, ahora usemos el --flat.
+
+```bash
+$ ng g c home -d --flat
+CREATE src/app/home.component.css (0 bytes)
+CREATE src/app/home.component.html (19 bytes)
+CREATE src/app/home.component.spec.ts (587 bytes)
+CREATE src/app/home.component.ts (191 bytes)
+UPDATE src/app/app.module.ts (462 bytes)
+```
+
+Crea el componente en la ruta ./src/app
+
+Coloquemos el Inline CSS **-s, --inline-style** y Inline Template **-t, --inline-template**
+
+```bash
+$ ng g c home -d --flat -s -t
+CREATE src/app/home.component.spec.ts (587 bytes)
+CREATE src/app/home.component.ts (183 bytes)
+UPDATE src/app/app.module.ts (462 bytes)
+```
+
+Finalmente creemos el componente sin los archivos de prueba con la opción **--skip-tests**
+
+```bash
+$ ng g c home -d --flat -s -t --skip-tests
+CREATE src/app/home.component.ts (183 bytes)
+UPDATE src/app/app.module.ts (462 bytes)
+```
+
+Ejecutamos este último comando sin el -d para aplicar los cambios:
+
+```bash
+$ ng g c home --flat -s -t --skip-tests
+CREATE src/app/home.component.ts (183 bytes)
+UPDATE src/app/app.module.ts (462 bytes)
+```
+
+El componente creado es el siguiente:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-home',
+  template: `
+    <p>
+      home works!
+    </p>
+  `,
+  styles: ``
+})
+export class HomeComponent {
+
+}
+```
+
+Adicionalmente, Ng Cli actualiza el **AppModule** y declara el nuevo componente. Pero, esto no lo hace visible al mundo exterior (fuera del componente) simplemente lo declara dentro del mismo módulo para su uso interno.
+
+```bash
+$ tree
+.
+├── app.component.css
+├── app.component.html
+├── app.component.spec.ts
+├── app.component.ts
+├── app.module.ts
+├── app-routing.module.ts
+└── home.component.ts  <--------------
+```
