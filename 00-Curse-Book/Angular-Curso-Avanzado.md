@@ -227,5 +227,30 @@ $ tree
 ├── app.component.ts
 ├── app.module.ts
 ├── app-routing.module.ts
-└── home.component.ts  <--------------
+└── home.component.ts  <=====
 ```
+
+## Opciones del NG Generate
+
+|Comando| Descripcion|
+|-|-|
+|ng g app-shell|Generates an application shell for running a server-side version of an app.|
+|ng g application [name]|Generates a new basic application definition in the "projects" subfolder of the workspace.|
+|ng g class [name]|Creates a new, generic class definition in the given project.|
+|ng g component [name]|Creates a new, generic component definition in the given project.|
+|ng g config [type]|Generates a configuration file in the given project.
+|ng g directive [name]|Creates a new, generic directive definition in the given project.|
+|ng g enum [name]|Generates a new, generic enum definition in the given project.|
+|ng g environments|Generates and configures environment files for a project.|
+|ng g guard [name]|Generates a new, generic route guard definition in the given project.|
+|ng g interceptor [name]|Creates a new, generic interceptor definition in the given project.|
+|ng g interface [name] [type]|Creates a new, generic interface definition in the given project.|
+|ng g library [name]|Creates a new, generic library project in the current workspace.|
+|ng g module [name]|Creates a new, generic NgModule definition in the given project.|
+|ng g pipe [name]|Creates a new, generic pipe definition in the given project.|
+|ng g resolver [name]|Generates a new, generic resolver definition in the given project.|
+|ng g service [name]|Creates a new, generic service definition in the given project.|
+|ng g service-worker |Pass this schematic to the "run" command to create a service worker
+|ng g web-worker [name]|Creates a new, generic web worker definition in the given project.
+
+
