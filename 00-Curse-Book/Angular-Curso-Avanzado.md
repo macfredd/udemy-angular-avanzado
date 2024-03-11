@@ -254,3 +254,206 @@ $ tree
 |ng g web-worker [name]|Creates a new, generic web worker definition in the given project.
 
 
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Nueva Aplicación:
+
+## ¿Qué veremos en esta sección?
+
+En esta sección trabajaremos sobre:
+
+- Uso del template administrativo
+- Código fuente del template
+- Uso de librerías externas
+- Creación de los primeros componentes
+- Separar el Login del template administrativo, ya que tienen estructuras diferentes
+- Animaciones por CSS
+- Respaldos en GitHub
+- Preparar el proyecto que usaremos a lo largo del curso
+
+
+## Creando COmponentes y Estructura de Directorios
+
+```bash
+#Auth
+$ ng g  c auth/login         --skip-tests -s
+$ ng g  c auth/register      --skip-tests -s
+#Pages
+$ ng g  c pages/nopagefound  --skip-tests -s
+$ ng g  c pages/dashboard    --skip-tests -s
+
+$ ng g  c shared/breadcrumbs --skip-tests -s
+$ ng g  c shared/side-bar    --skip-tests -s
+$ ng g  c shared/header      --skip-tests -s
+
+```
+
+## Importanto Plantilla existente
+
+Usaremos una plantilla previamente diseñada, la cual contiene todas las dependeicnas, tales como imágenes, estilos, plugins, librerias de terceros, etc.
+
+Copiaremos a nuestra carpeta **Assets** todos esos elementos y modificaremos nuestro index.html para incluir dichos elementos en nuestra página.
+
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdminPro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon.png">
+
+  <!-- Bootstrap Core CSS -->
+  <link href="./assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="./assets/css/style.css" rel="stylesheet">
+  <!-- You can change the theme colors from here -->
+  <link href="./assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
+
+
+</head>
+<body class="fix-header card-no-border fix-sidebar">
+  <app-root></app-root>
+
+   <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+    <script src="./assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="./assets/plugins/bootstrap/js/popper.min.js"></script>
+    <script src="./assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="./assets/js/perfect-scrollbar.jquery.min.js"></script>
+    <!--Wave Effects -->
+    <script src="./assets/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="./assets/js/sidebarmenu.js"></script>
+    <!--stickey kit -->
+    <script src="./assets/plugins/sticky-kit-master/dist/sticky-kit.min.js"></script>
+    <script src="./assets/plugins/sparkline/jquery.sparkline.min.js"></script>
+    <!--Custom JavaScript -->
+    <script src="./assets/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Style switcher -->
+    <!-- ============================================================== -->
+    <script src="./assets/plugins/styleswitcher/jQuery.style.switcher.js"></script>
+</body>
+</html>
+```
+
+El proceso para incorporar una plantilla consiste en tomar cada parte y colocarla en el lugar adecuado, tal como si comenzó con el index.html. 
+
+
+La siguiente sección la dejaremos en el index.html, muestra una animación durante la carga de la página.
+
+```html
+<!-- ============================================================== -->
+<!-- Preloader - style you can find in spinners.css -->
+<!-- ============================================================== -->
+<div class="preloader">
+    <div class="loader">
+        <div class="loader__figure"></div>
+        <p class="loader__label">Admin Pro</p>
+    </div>
+</div>
+```
+
+Posteriormente sigue la sección del header. El HTML d esa sección la colocaremos en el componente **HeaderComponent**
+
+```html
+<!-- ============================================================== -->
+<!-- Topbar header - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<header class="topbar">
+  <!-- Copiamos toda la sección del header -->
+</header>
+```
+
+Ahora podemos agregar el **main-wrapper** y el componente Header en el template del **AppComponent** 
+
+```html
+<div id="main-wrapper">
+  <app-header></app-header>
+</div>
+```
+
+<img src="./imagenes/01-adminPro-01.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+
+Moveremos toda la sección del **Left Sidebar** a nuestro SideBarComponent.
+
+```html
+<!-- ============================================================== -->
+<!-- Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
+  <aside class="left-sidebar"></aside>
+````
+
+Y luego lo agregamos a nuestro AppComponent:
+
+```html
+<div id="main-wrapper">
+  <app-header></app-header>
+  <app-side-bar></app-side-bar>
+</div>
+```
+
+Luego copiaremos algunas secciones directamentene en nuestro template principal, porque ellas mostraran internamente todas nuestras rutas
+
+
+```html
+<div id="main-wrapper">
+  <app-header></app-header>
+  <app-side-bar></app-side-bar>
+
+  <div class="page-wrapper">
+    <div class="container-fluid">
+      <!-- Sistema de Rutas -->
+    </div>
+  </div>
+</div>
+```
+
+La siguiente sección que debemos de mover es la **Bread crumb** y lo hacemos a nuestro componente **BreadcrumbsComponent** Y movemos el footer directamente al template principal. No usaremos el Rigth Side Bar. El template principal queda así:
+
+```html
+<div id="main-wrapper">
+  <app-header></app-header>
+  <app-side-bar></app-side-bar>
+
+  <div class="page-wrapper">
+    <div class="container-fluid">
+      <app-breadcrumbs></app-breadcrumbs>
+
+      <!-- Sistema de Rutas -->
+
+
+      <!-- ============================================================== -->
+      <!-- Start Page Content -->
+      <!-- ============================================================== -->
+      <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    This is some text within a card block.
+                </div>
+            </div>
+        </div>
+      </div>
+      <!-- ============================================================== -->
+      <!-- End PAge Content -->
+      <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- footer -->
+    <!-- ============================================================== -->
+    <footer class="footer">
+      © 2024 Admin Pro by wrappixel.com
+    </footer>
+    <!-- ============================================================== -->
+    <!-- End footer -->
+    <!-- ============================================================== -->
+  </div>
+</div>
+```
