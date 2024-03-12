@@ -485,5 +485,43 @@ const routes: Routes = [
 export class AppRoutingModule { }
 ```
 
+Finalmente implementamos nuestro **router-outlet** en el AppComponent para mostrar cada uno de los componentes dentro del contenedor **container-fluid**
 
+## Rutas Secundarias
+
+En este momento todos los componente, incluyendo el Login y Register se muestran como un componente más dentro del Dashboard. El Dashboard debe de mostrarse únicamente si el usuario está logeado.
+
+La idea es crear un componente que muestre todo el Layout actual, el dashdoard con sus componentes, para ello vamos a mover todo el código HTML del AppComponent a un nuevo componente:
+
+```bash
+$ ng g c pages/pages -s --skip-tests --flat 
+```
+
+Este componente se va a mostrar únicamente cuando el usuario esté logeado. 
+
+Haremos estos cambios en nuestro sistema de Rutas:
+
+```typescript
+const routes: Routes = [
+
+  {
+    path: '',
+    component: PagesComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'progress', component: ProgressComponent },
+      { path: 'grafica1', component: Grafica1Component },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    ],
+  },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: '**', component: NopagefoundComponent }
+  
+];
+```
+
+Aca lo que estamos indicando es que login y register van a renderizarse fuera del componente Pages, que es el que renderiza el template con los headers, sideBar, etc. 
+
+De esta forma tenemos las rutas de login y register independientes y podemos implementar su propio template.
 
