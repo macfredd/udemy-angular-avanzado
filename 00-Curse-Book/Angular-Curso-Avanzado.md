@@ -525,3 +525,14 @@ Aca lo que estamos indicando es que login y register van a renderizarse fuera de
 
 De esta forma tenemos las rutas de login y register independientes y podemos implementar su propio template.
 
+## Separando Login y Register del Template
+
+Usaremos como plantilla el archivo **Pages-login-2.html** y **Pages-register2.html**, copiaremos la sección **<section id="wrapper">** y lo colocaremos en su correspondiente template (login & register)
+
+
+Ambos template tienen su propio CSS
+```html
+<link href="css/pages/login-register-lock.css" rel="stylesheet">
+<link href="css/pages/login-register-lock.css" rel="stylesheet">
+```
+Copiaremos el contenido del Css y lo moveremos al correspondiente CSS file del componente.
