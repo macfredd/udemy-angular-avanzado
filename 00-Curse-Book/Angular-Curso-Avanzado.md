@@ -457,3 +457,33 @@ La siguiente sección que debemos de mover es la **Bread crumb** y lo hacemos a 
   </div>
 </div>
 ```
+
+## Rutas Principales
+Creamos un par de componentes más: 
+```bash
+$ ng g c pages/progress -s --skip-tests
+$ ng g c pages/grafica1 -s --skip-tests
+```
+
+Y luego definimos las rutas principales
+
+```typescript
+const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'progress', component: ProgressComponent },
+  { path: 'grafica1', component: Grafica1Component },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '**', component: NopagefoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+
+
