@@ -536,3 +536,6 @@ Ambos template tienen su propio CSS
 <link href="css/pages/login-register-lock.css" rel="stylesheet">
 ```
 Copiaremos el contenido del Css y lo moveremos al correspondiente CSS file del componente.
+
+## Page 404
+
