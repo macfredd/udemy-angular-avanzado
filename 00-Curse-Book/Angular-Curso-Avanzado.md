@@ -457,3 +457,268 @@ La siguiente sección que debemos de mover es la **Bread crumb** y lo hacemos a 
   </div>
 </div>
 ```
+
+## Rutas Principales
+Creamos un par de componentes más: 
+```bash
+$ ng g c pages/progress -s --skip-tests
+$ ng g c pages/grafica1 -s --skip-tests
+```
+
+Y luego definimos las rutas principales
+
+```typescript
+const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'progress', component: ProgressComponent },
+  { path: 'grafica1', component: Grafica1Component },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '**', component: NopagefoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+Finalmente implementamos nuestro **router-outlet** en el AppComponent para mostrar cada uno de los componentes dentro del contenedor **container-fluid**
+
+## Rutas Secundarias
+
+En este momento todos los componente, incluyendo el Login y Register se muestran como un componente más dentro del Dashboard. El Dashboard debe de mostrarse únicamente si el usuario está logeado.
+
+La idea es crear un componente que muestre todo el Layout actual, el dashdoard con sus componentes, para ello vamos a mover todo el código HTML del AppComponent a un nuevo componente:
+
+```bash
+$ ng g c pages/pages -s --skip-tests --flat 
+```
+
+Este componente se va a mostrar únicamente cuando el usuario esté logeado. 
+
+Haremos estos cambios en nuestro sistema de Rutas:
+
+```typescript
+const routes: Routes = [
+
+  {
+    path: '',
+    component: PagesComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'progress', component: ProgressComponent },
+      { path: 'grafica1', component: Grafica1Component },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    ],
+  },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: '**', component: NopagefoundComponent }
+  
+];
+```
+
+Aca lo que estamos indicando es que login y register van a renderizarse fuera del componente Pages, que es el que renderiza el template con los headers, sideBar, etc. 
+
+De esta forma tenemos las rutas de login y register independientes y podemos implementar su propio template.
+
+## Separando Login y Register del Template
+
+Usaremos como plantilla el archivo **Pages-login-2.html** y **Pages-register2.html**, copiaremos la sección **<section id="wrapper">** y lo colocaremos en su correspondiente template (login & register)
+
+
+Ambos template tienen su propio CSS
+```html
+<link href="css/pages/login-register-lock.css" rel="stylesheet">
+<link href="css/pages/login-register-lock.css" rel="stylesheet">
+```
+Copiaremos el contenido del Css y lo moveremos al correspondiente CSS file del componente.
+
+Haremos un trabajo similar con la Página 404.
+
+Este proceso lo podemos repetir para incorporar parte de la plantilla a nuestra app de Angular.
+
+
+
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Módulos:
+
+## ¿Qué veremos en esta sección?
+
+Esta sección esta enfocada en módulos principalmente:
+
+ - Crear un módulo personalizado
+ - Crear rutas hijas
+ - Comenzaremos a crear módulos para agrupar tareas específicas
+ - Realizar cambios en GitHub
+ - Crear Release Tags que nos permitan descargar el código fácilmente, en caso de que necesitemos volver a comenzar donde nos quedemos.
+
+
+Ahora mismo nuestro AppModule luce de la siguiente forma:
+
+```typescript
+@NgModule({
+  declarations: [
+    AppComponent,
+    // Agregarlo a un módulo Auth
+    LoginComponent,
+    RegisterComponent,
+    // Agregarlo a un módulo Shared
+    BreadcrumbsComponent,
+    SideBarComponent,
+    HeaderComponent,
+    // Agrupar en un Módulo Pages
+    DashboardComponent,
+    ProgressComponent,
+    Grafica1Component,
+    PagesComponent,
+    NopagefoundComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Como podemos ver, todos los componentes han sido declarados en el módulo principal, en un futuro, esto puede represenar un problema. A medida que crece nuestra APP, vamos a incorporar más componentes. Lo ideal es separar en módulos que agrupen componentes específicos.
+
+La idea es crear módulos para cada uno de nuestros directorios principales, en este caso Auth, Pages y Shared
+
+```bash
+├── auth
+│   ├── login
+│   └── register
+├── pages
+│   ├── dashboard
+│   ├── grafica1
+│   ├── nopagefound
+│   ├── pages.component.html
+│   ├── pages.component.ts
+│   └── progress
+└── shared
+    ├── breadcrumbs
+    ├── header
+    └── side-bar
+```
+
+Notar que **pages.component.ts** se creó con --flat dentro del direcotrio principal de pages.
+
+Creamos tres módulos
+
+```bash
+$ ng g m auth
+CREATE src/app/auth/auth.module.ts (190 bytes)
+
+$ ng g m pages
+CREATE src/app/pages/pages.module.ts (191 bytes)
+
+$ ng g m shared
+CREATE src/app/shared/shared.module.ts (192 bytes)
+
+```
+
+Movemos a cada módulo sus componentes:
+
+
+Auth:
+
+```typescript
+@NgModule({
+  declarations: [
+    LoginComponent,
+    RegisterComponent,
+  ],
+  imports: [
+    CommonModule
+  ],
+  exports: [
+    LoginComponent,
+    RegisterComponent,
+  ]
+})
+export class AuthModule { }
+```
+
+Pages:
+
+```typescript
+@NgModule({
+  declarations: [
+    DashboardComponent,
+    Grafica1Component,
+    ProgressComponent,
+    PagesComponent
+  ],
+  exports: [
+    DashboardComponent,
+    Grafica1Component,
+    ProgressComponent,
+    PagesComponent,
+  ],
+  imports: [
+    CommonModule,
+    AppRoutingModule, /* or RouterModule*/
+    SharedModule
+  ]
+})
+export class PagesModule { }
+```
+
+NOTA: En lugar del **AppRoutingModule** podemos usar el **RouterModule** ya que solo necesitamos el **router-outlet** para mostrar la páginas según la ruta en nuestra **pages.component.html** 
+
+Angular ya ha cargado globalmente nuestro **AppRoutingModule** con nuestrar reglas de ruteo.
+
+
+Shared:
+
+```typescript
+@NgModule({
+  declarations: [
+    BreadcrumbsComponent,
+    SideBarComponent,
+    HeaderComponent,
+  ],
+  exports: [
+    BreadcrumbsComponent,
+    SideBarComponent,
+    HeaderComponent,
+  ],
+  imports: [
+    CommonModule
+  ]
+})
+export class SharedModule { }
+```
+
+Y nuestro AppModule quedará de la siguiente forma:
+
+
+```typescript
+@NgModule({
+  declarations: [
+    AppComponent,
+    NopagefoundComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    PagesModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Hemos dejado **NopagefoundComponent** porque es un componente que debe de mostrarse independientemente el usuario esté logeado o no.
+
+
+
