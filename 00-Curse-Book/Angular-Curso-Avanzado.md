@@ -718,7 +718,89 @@ Y nuestro AppModule quedará de la siguiente forma:
 export class AppModule { }
 ```
 
-Hemos dejado **NopagefoundComponent** porque es un componente que debe de mostrarse independientemente el usuario esté logeado o no.
+Hemos dejado **NopagefoundComponent** porque es un componente que debe de mostrarse independientemente el usuario esté logeado o no. De hecho lo vamos a mover a la raiz del proyecto:
+
+```bash
+src/app/
+├── auth
+├── nopagefound
+│   ├── nopagefound.component.css
+│   ├── nopagefound.component.html
+│   └── nopagefound.component.ts
+├── pages
+│   ├── dashboard
+│   ├── grafica1
+│   └── progress
+└── shared
+```
 
 
+## Reorganizando rutas:
 
+Otro tipo de mejora o buena práctica consiste en evitar que el **AppRoutingModule** cargue todas las rutas, lo ideal es que cada sección o módulo que pueda llegar a crecer en número de páginas, tenga su propio sistema de rutas.
+
+Por ejemplo, ahora mismo el **AppRoutingModule** maneja todas las rutas, y como se puede ver el 
+
+
+```typescript
+const routes: Routes = [
+
+  {
+    path: '',
+    component: PagesComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'progress', component: ProgressComponent },
+      { path: 'grafica1', component: Grafica1Component },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    ],
+  },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: '**', component: NopagefoundComponent }
+];
+```
+
+Creamo un nuevo archivo dentro de __src/app/pages__ con el nombre **pages-routing.module.ts** y usamos los snippest de angular para crear un template del routing, **ng-router** y movemos todas las rutas que apuntan a paginas dentro de **pages** quedando de esta forma:
+
+```typescript
+onst routes: Routes = [
+    {
+        path: '',
+        component: PagesComponent,
+        children: [
+          { path: 'dashboard', component: DashboardComponent },
+          { path: 'progress', component: ProgressComponent },
+          { path: 'grafica1', component: Grafica1Component },
+          { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+        ],
+      },
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
+})
+export class PagesRoutingModule {}
+```
+
+Y nuestro sistema de rutas principal se reduce a:
+
+```typescript
+const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: '**', component: NopagefoundComponent }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(routes),
+    PagesRoutingModule,
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+Notar como hemos importado el **PagesRoutingModule** en la sección de Imports.
