@@ -804,3 +804,49 @@ export class AppRoutingModule { }
 ```
 
 Notar como hemos importado el **PagesRoutingModule** en la sección de Imports.
+
+## Mejorar la Navegación
+
+Actualmente tenemos estos  URL
+
+http://localhost:4200/dashboard
+http://localhost:4200/progress
+http://localhost:4200/grafica1
+
+
+```typescript
+const routes: Routes = [
+    {
+        path: '',
+        component: PagesComponent,
+        children: [
+          { path: 'dashboard', component: DashboardComponent },
+          { path: 'progress', component: ProgressComponent },
+          { path: 'grafica1', component: Grafica1Component },
+          { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+        ],
+      },
+];
+```
+Para cargar los componentes progress y grafica1 dentro del Dashboard, tal como se muestran en los siguientes URL: 
+
+http://localhost:4200/dashboard
+http://localhost:4200/dashboard/progress
+http://localhost:4200/dashboard/grafica1
+
+Debemos aplicar estos cambios.
+
+```typescript
+const routes: Routes = [
+    {
+        path: 'dashboard',
+        component: PagesComponent,
+        children: [
+          { path: '', component: DashboardComponent },
+          { path: 'progress', component: ProgressComponent },
+          { path: 'grafica1', component: Grafica1Component },
+        ],
+      },
+];
+```
+
