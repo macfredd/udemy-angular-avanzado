@@ -850,3 +850,18 @@ const routes: Routes = [
 ];
 ```
 
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Inputs y Outputs:
+
+## ¿Qué veremos en esta sección?
+
+sta sección esta dedicada a los componentes y el envío de información entre ellos.
+
+- Trabajaremos con Outputs, Inputs y ViewChild
+- Aprenderemos como utilizar atributos personalizados
+- Crearemos un componente re utilizable con una funcionalidad en especifico
+- Aprenderemos a tener referencias a elementos HTML
+- Tips de JavaScript puro: colocar el foco en elementos
+- Uso de gráficas como componentes personalizados
+

@@ -1,1 +1,51 @@
-<p>progress works!</p>
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Striped Progress bar</h4>
+                <div class="progress m-t-20">
+                    <div class="progress-bar bg-primary progress-bar-striped active" 
+                         aria-valuenow="85" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100" 
+                         style="height:15px;"
+                         [style.width]="Percentage_1"
+                         role="progressbar">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <app-incrementador  (valorDeSalida)="progress_1 = $event" 
+                                                [progress]="progress_1"
+                                                clase="bg-primary">
+                            </app-incrementador>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress m-t-20">
+                    <div class="progress-bar bg-info progress-bar-striped active" 
+                         aria-valuenow="85" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100" 
+                         style="height:15px;"
+                         [style.width]="Percentage_2"
+                         role="progressbar">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <app-incrementador  (valorDeSalida)="progress_2 = $event" 
+                                                [progress]="progress_2"
+                                                clase="bg-info">
+                            </app-incrementador>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 

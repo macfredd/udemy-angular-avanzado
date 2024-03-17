@@ -6,6 +6,8 @@ import { ProgressComponent } from './progress/progress.component';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { PagesComponent } from './pages.component';
+import { FormsModule } from '@angular/forms';
+import { ComponentsModule } from '../components/components.module';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { PagesComponent } from './pages.component';
   imports: [
     CommonModule,
     RouterModule,
-    SharedModule
+    SharedModule,
+    FormsModule,
+    ComponentsModule
   ]
 })
 export class PagesModule { }
