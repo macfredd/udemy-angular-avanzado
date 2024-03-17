@@ -11,6 +11,8 @@
         class="form-control"
         placeholder="Progress"
         [(ngModel)]="progress"
+        (ngModelChange)="onChange($event)"
+        [ngClass]="{'is-invalid': (progress > 100 || progress < 0)}"
         >
     <span class="input-group-btn">
         <button (click)="changePercentage(+5)" class="btn {{clase}}" type="button">
