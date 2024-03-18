@@ -865,3 +865,19 @@ sta sección esta dedicada a los componentes y el envío de información entre e
 - Tips de JavaScript puro: colocar el foco en elementos
 - Uso de gráficas como componentes personalizados
 
+<aside class="nota-importante">
+<p>
+  Los temas Outputs, Inputs y ViewChild se vieron en el curso básico.
+</p>
+</aside>
+
+<img src="./imagenes/01-adminPro-02.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+## Gráficos en Angular
+
+Instalamos estas dos librerias:
+
+```bash
+$ npm install --save ng2-charts
+$ npm install --save chart.js
+```
