@@ -881,3 +881,114 @@ Instalamos estas dos librerias:
 $ npm install --save ng2-charts
 $ npm install --save chart.js
 ```
+
+
+
+### Configuración global:
+
+En el App.Module importamos:
+
+```typescript
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+```
+
+Y luego en la sección de Providers del mismo AppModule:
+
+```typescript
+providers: [
+   provideCharts(withDefaultRegisterables()),
+],
+```
+
+### COnfiguración en el módulo específico
+
+En el PageModule importaremos la libreria, que que el componente Grafica1 está declarado dentre de Pages.
+
+```typescript
+import { BaseChartDirective } from 'ng2-charts';
+
+// Luego importamos la directiva
+
+@NgModule({
+  declarations: [
+  ],
+  exports: [
+  ],
+  imports: [
+    BaseChartDirective,
+  ]
+})
+export class PagesModule { }
+```
+
+### El Componente:
+
+Este se obtiene de la documentación oficial, a modo de ejemplo:
+
+```typescript
+
+import { Component } from '@angular/core';
+import { ChartData, ChartEvent, ChartType } from 'chart.js';
+
+@Component({
+  selector: 'app-grafica1',
+  templateUrl: './grafica1.component.html',
+  styles: ``
+})
+export class Grafica1Component {
+  // Doughnut
+  public doughnutChartLabels: string[] = [
+    'Download Sales',
+    'In-Store Sales',
+    'Mail-Order Sales',
+  ];
+  public doughnutChartData: ChartData<'doughnut'> = {
+    labels: this.doughnutChartLabels,
+    datasets: [
+      { data: [350, 450, 100] },
+      { data: [50, 150, 120] },
+      { data: [250, 130, 70] },
+    ],
+  };
+  public doughnutChartType: ChartType = 'doughnut';
+
+  // events
+  public chartClicked({
+    event,
+    active,
+  }: {
+    event: ChartEvent;
+    active: object[];
+  }): void {
+    console.log(event, active);
+  }
+
+  public chartHovered({
+    event,
+    active,
+  }: {
+    event: ChartEvent;
+    active: object[];
+  }): void {
+    console.log(event, active);
+  }
+}
+```
+Y finalmente el Template:
+
+```html
+<div class="row">
+    <div class="col-4">
+        <div style="display: block">
+            <canvas baseChart 
+                    [data]="doughnutChartData" 
+                    [type]="doughnutChartType">
+            </canvas>
+        </div>
+    </div>
+</div>
+```
+
+El resultado:
+
+<img src="./imagenes/01-adminPro-03.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
