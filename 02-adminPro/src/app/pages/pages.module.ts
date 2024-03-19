@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ComponentsModule } from '../components/components.module';
 import { BaseChartDirective } from 'ng2-charts';
 import { Grafica2Component } from './graficas/grafica2/grafica2.component';
+import { GraphHomeComponent } from './graficas/home.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { Grafica2Component } from './graficas/grafica2/grafica2.component';
     Grafica1Component,
     ProgressComponent,
     PagesComponent,
-    Grafica2Component
+    Grafica2Component,
+    GraphHomeComponent
   ],
   exports: [
     DashboardComponent,
