@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ChartData, ChartEvent, ChartType } from 'chart.js';
 
 @Component({
@@ -7,21 +7,30 @@ import { ChartData, ChartEvent, ChartType } from 'chart.js';
   templateUrl: './grafica1.component.html',
   styles: ``
 })
-export class Grafica1Component {
+export class Grafica1Component implements OnInit {
+  
+
+  @Input() public title: string = 'Graph Title'
+
+  @Input() public dataArray: number[] = [1,20,30];
+
   // Doughnut
-  public doughnutChartLabels: string[] = [
-    'Download Sales',
-    'In-Store Sales',
-    'Mail-Order Sales',
+  @Input() public lables: string[] = [
+    'Label 1',
+    'Label 2',
+    'Label 3',
   ];
-  public doughnutChartData: ChartData<'doughnut'> = {
-    labels: this.doughnutChartLabels,
-    datasets: [
-      { data: [350, 450, 100] },
-      { data: [50, 150, 120] },
-      { data: [250, 130, 70] },
-    ],
-  };
+  public doughnutChartData?: ChartData<'doughnut'>; 
+
+  ngOnInit(): void {
+    this.doughnutChartData = {
+      labels: this.lables,
+      datasets: [
+        { data : this.dataArray},
+      ],
+    };
+  }
+
   public doughnutChartType: ChartType = 'doughnut';
 
   // events

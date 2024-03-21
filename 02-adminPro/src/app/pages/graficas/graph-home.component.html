@@ -1,19 +1,25 @@
 
 <div class="row">
     <div class="col-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Grafica 1</h5>
-                <app-grafica1></app-grafica1>
-            </div>
-        </div>
+        <app-grafica1 
+            title="Game Console Sales" 
+            [dataArray]="[45, 35, 20]"
+            [lables]="['Ps5', 'Xbox', 'Switch']">
+        </app-grafica1>
     </div>
     <div class="col-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Grafica 2</h5>
-                <app-grafica2></app-grafica2>
-            </div>
-        </div>
+        <app-grafica1 
+            title="Most Popular Futbol Player" 
+            [dataArray]="[50, 20, 10, 15, 5]"
+            [lables]="['Messi', 'Maradona', 'Pele', 'Zidane', 'Ronaldinho']">
+        </app-grafica1>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-6">
+        <app-grafica2>
+        </app-grafica2>
     </div>
 </div>
