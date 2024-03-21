@@ -992,3 +992,44 @@ Y finalmente el Template:
 El resultado:
 
 <img src="./imagenes/01-adminPro-03.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+## Parametrizar el Componente
+
+Podemos hacer parametrizable ciertos elementos del componente como los labels y los valores:
+
+```typescript
+@Input() public title: string = 'Graph Title'
+@Input() public dataArray: number[] = [1,20,30];
+@Input() public lables: string[] = ['Label 1', 'Label 2', 'Label 3'];
+```
+
+Luego debemos implementar el **ngOnInit** para inicializar los valores desde los Inputs:
+
+```typescript
+ngOnInit(): void {
+    this.doughnutChartData = {
+      labels: this.lables,
+      datasets: [
+        { data : this.dataArray},
+      ],
+    };
+  }
+```
+
+Y luego podemos usar el componente en nuestras páginas:
+
+```html
+<app-grafica1 
+    title="Game Console Sales" 
+    [dataArray]="[45, 35, 20]"
+    [lables]="['Ps5', 'Xbox', 'Switch']">
+</app-grafica1>
+<app-grafica1 
+    title="Best All Time Football Player" 
+    [dataArray]="[50, 20, 10, 15, 5]"
+    [lables]="['Messi', 'Maradona', 'Pele', 'Zidane', 'Ronaldinho']">
+</app-grafica1>
+```
+
+
+<img src="./imagenes/01-adminPro-04.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
