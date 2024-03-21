@@ -1033,3 +1033,129 @@ Y luego podemos usar el componente en nuestras páginas:
 
 
 <img src="./imagenes/01-adminPro-04.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Servicios, Rutas y persistencia de ajustes:
+
+## ¿Qué veremos en esta sección?
+
+Esta sección tiene varios temas importantes:
+
+- Crearemos un módulo para agrupar todos nuestros servicios
+- Aprenderemos a ejecutar scripts en archivos de JavaScript puros, en TypeScript
+- LocalStorage
+- Cambiar CSS de forma dinámica
+- Crear un componente para los ajustes del tema
+- Tips de JavaScript que se pueden usar en TypeScript
+- Preparar el servicio del Sidebar, el cual usaremos más adelante para crear nuestro menú dinámico en base a las respuestas de nuestro backend server.
+
+
+## Nuevo componente:
+
+Account Settings: 
+
+```bash
+ $ ng g c pages/settings --skip-tests --s
+ ```
+
+ Agregamos este Template:
+
+ ```html
+<!-- Card Wrapper-->
+<h4>Select Theme</h4>
+<div class="r-panel-body">
+    <ul id="themecolors" class="m-t-20">
+        <li><b>Con el sidebar claro</b></li>
+        <li>
+          <li><a 
+            (click)="changeTheme('default')" 
+            data-theme="default" 
+            class="selector default-theme">1</a></li>
+        </li>
+        <!-- Mas temas aca-->
+        <li class="d-block m-t-30"><b>Con el sidebar oscuro</b></li>
+        <li>
+          <a 
+            (click)="changeTheme('default-dark')" 
+            data-theme="default-dark" 
+            class="selector default-dark-theme">7
+          </a>
+        </li>
+        <!-- Mas temas aca-->
+    </ul>
+</div>
+<!-- Card Wrapper-->             
+
+```
+Veremos esto:
+
+<img src="./imagenes/01-adminPro-05.png" alt="Diseño Básico" style="margin-right: 10px; width: 40%; height: auto; border: 1px solid black" />
+
+## Cambiar Tema de forma dinámica
+
+En el inde.html tenemos esto: 
+```html
+<!-- You can change the theme colors from here -->
+<link href="./assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
+```
+
+El objetivo es cambiar dinamicamente este link según el tema seleccionado por el usuario:
+
+```typescript
+export class SettingsComponent implements OnInit{
+  ngOnInit(): void {
+    this.checkCurrentTheme();
+  }
+
+  // these lines avoid hit the DOM multiple times
+  linkTheme?: Element | null = document.querySelector('#theme') ;
+  links = document.querySelectorAll('.selector');
+  
+  changeTheme(theme: string) {
+    const themeUrl = `./assets/css/colors/${ theme }.css`;
+
+    if (this.linkTheme === null) {
+      const newLinkTheme = document.createElement('link');
+      newLinkTheme.setAttribute('id', 'theme');
+      newLinkTheme.setAttribute('rel', 'stylesheet');
+      newLinkTheme.setAttribute('href', themeUrl);
+      document.head.append(newLinkTheme);
+    } else {
+      this.linkTheme!.setAttribute('href', themeUrl);
+    }
+    localStorage.setItem('themeUrl', themeUrl);
+    this.checkCurrentTheme();
+
+  }
+
+  checkCurrentTheme() {
+    this.links.forEach( elem => {
+      elem.classList.remove('working');
+      const btnTheme = elem.getAttribute('data-theme');
+      const btnThemeUrl = `./assets/css/colors/${ btnTheme }.css`;
+      const currentTheme = this.linkTheme?.getAttribute('href') || '';
+
+      if (btnThemeUrl === currentTheme) {
+        elem.classList.add('working');
+      }
+    });
+  }
+}
+
+```
+
+Al guardar en el localStorage el theme seleccionado, ya disponemos de dicha información para establecer el tema al cargar la applicación. Este template usa el tema una vez logeado el usuario, porque el Login y el Register usan su propio estilo. Así que implementaremos esto en el PagesComponent
+
+```typescript
+export class PagesComponent implements OnInit {
+  ngOnInit(): void {
+    const linkTheme = document.querySelector('#theme');
+    const themeUrl = localStorage.getItem('themeUrl') || './assets/css/colors/default.css';
+    linkTheme?.setAttribute('href', themeUrl);
+  }
+}
+```
+
+De esta forma cuando el usuario selecciona un thema se cambia automáticamente y al recargar la aplicación se usa el último tema seleccionado.

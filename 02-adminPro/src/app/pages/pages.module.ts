@@ -11,6 +11,7 @@ import { ComponentsModule } from '../components/components.module';
 import { BaseChartDirective } from 'ng2-charts';
 import { Grafica2Component } from './graficas/grafica2/grafica2.component';
 import { GraphHomeComponent } from './graficas/home.component';
+import { SettingsComponent } from './settings/settings.component';
 
 
 @NgModule({
@@ -20,13 +21,15 @@ import { GraphHomeComponent } from './graficas/home.component';
     ProgressComponent,
     PagesComponent,
     Grafica2Component,
-    GraphHomeComponent
+    GraphHomeComponent,
+    SettingsComponent
   ],
   exports: [
     DashboardComponent,
     Grafica1Component,
     ProgressComponent,
     PagesComponent,
+    SettingsComponent,
   ],
   imports: [
     CommonModule,
