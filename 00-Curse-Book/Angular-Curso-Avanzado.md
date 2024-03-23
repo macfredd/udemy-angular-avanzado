@@ -1231,3 +1231,75 @@ export class SettingsService {
   }
 }
 ```
+
+## Router Link
+
+Cambiemo el sideBar HTML, vamos a usar nuestro nuevo componente. El link siguiente:
+```html
+<li><a href="javascript:void()">Account Setting</a></li>
+```
+
+Lo cambiamos por:
+```html
+<li><a routerLink="/dashboard/settings">Account Setting</a></li>
+```
+
+Para usar el **routerLink** necesitamos importar el **RouterModule** en el Módulo al que pertenece el SideBar, es decir el **ShareModule**.
+
+
+## Servicio para controlar el sideBar
+
+La idea es crear las opciones del sideBar de manera dinámica.
+
+```bash
+$ ng g s services/sidebar --skip-tests
+```
+
+CReamos el servicio
+
+```typescript
+export class SidebarService {
+
+  private menu: MenuImtes[] = [
+    {
+      title: 'Dashboard',
+      icon: 'mdi mdi-gauge',
+      submenu: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Progress Bar', url: 'progress' },
+        { title: 'Gráficas', url: 'graficas' },
+      ]
+    }
+  ];
+
+  constructor() { }
+
+  getMenu(): MenuImtes[] {
+    return this.menu;
+  }
+}
+```
+
+Y usamos el menú en nuestro template
+
+```typescript
+@for (item of menu; track $index) {
+    <li> 
+        <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false">
+            <i class="mdi mdi-gauge"></i>
+            <span class="hide-menu">{{ item.title }}
+                <span 
+                    class="label label-rouded label-themecolor pull-right">
+                    {{ item.submenu.length }}
+                </span>
+            </span>
+        </a>
+        <ul aria-expanded="false" class="collapse">
+            @for (item of item.submenu; track $index) {
+                <li><a routerLink="{{ item.url }}">{{ item.title }}</a></li>
+            }
+        </ul>
+    </li>
+}
+```
+
