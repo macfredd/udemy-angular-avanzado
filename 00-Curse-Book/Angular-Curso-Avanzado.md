@@ -1159,3 +1159,75 @@ export class PagesComponent implements OnInit {
 ```
 
 De esta forma cuando el usuario selecciona un thema se cambia automáticamente y al recargar la aplicación se usa el último tema seleccionado.
+
+
+## Setting Services
+
+Vamos a mover las configuraciones que habiamos colocado en **SettingsComponent** a un servicio
+
+```bash
+$ ng g s services/settings
+```
+
+El componente queda de esta forma:
+
+```typescript
+export class SettingsComponent implements OnInit{
+  
+  constructor(private settingsService: SettingsService) { }
+
+  ngOnInit(): void {
+    this.settingsService.checkCurrentTheme();
+  }
+
+  // Change the theme
+  changeTheme(theme: string) {
+    this.settingsService.changeTheme(theme);
+  }
+}
+```
+
+Y el servicio ahora contiene toda la lógica del Setting template:
+
+```typescript
+export class SettingsService {
+
+  private linkTheme = document.querySelector('#theme');
+  
+  constructor() { 
+    const themeUrl = localStorage.getItem('themeUrl') || './assets/css/colors/default.css';
+    this.linkTheme?.setAttribute('href', themeUrl);
+  }
+
+  changeTheme(theme: string) {
+    const themeUrl = `./assets/css/colors/${ theme }.css`;
+
+    if (this.linkTheme === null) {
+      const newLinkTheme = document.createElement('link');
+      newLinkTheme.setAttribute('id', 'theme');
+      newLinkTheme.setAttribute('rel', 'stylesheet');
+      newLinkTheme.setAttribute('href', themeUrl);
+      document.head.append(newLinkTheme);
+    } else {
+      this.linkTheme!.setAttribute('href', themeUrl);
+    }
+    localStorage.setItem('themeUrl', themeUrl);
+    this.checkCurrentTheme();
+  }
+
+  // Check the current theme
+  checkCurrentTheme() {
+    const links = document.querySelectorAll('.selector');
+    links?.forEach( elem => {
+      elem.classList.remove('working');
+      const btnTheme = elem.getAttribute('data-theme');
+      const btnThemeUrl = `./assets/css/colors/${ btnTheme }.css`;
+      const currentTheme = this.linkTheme?.getAttribute('href') || '';
+
+      if (btnThemeUrl === currentTheme) {
+        elem.classList.add('working');
+      }
+    });
+  }
+}
+```
