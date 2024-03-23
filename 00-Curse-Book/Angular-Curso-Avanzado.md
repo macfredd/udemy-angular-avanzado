@@ -992,3 +992,242 @@ Y finalmente el Template:
 El resultado:
 
 <img src="./imagenes/01-adminPro-03.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+## Parametrizar el Componente
+
+Podemos hacer parametrizable ciertos elementos del componente como los labels y los valores:
+
+```typescript
+@Input() public title: string = 'Graph Title'
+@Input() public dataArray: number[] = [1,20,30];
+@Input() public lables: string[] = ['Label 1', 'Label 2', 'Label 3'];
+```
+
+Luego debemos implementar el **ngOnInit** para inicializar los valores desde los Inputs:
+
+```typescript
+ngOnInit(): void {
+    this.doughnutChartData = {
+      labels: this.lables,
+      datasets: [
+        { data : this.dataArray},
+      ],
+    };
+  }
+```
+
+Y luego podemos usar el componente en nuestras páginas:
+
+```html
+<app-grafica1 
+    title="Game Console Sales" 
+    [dataArray]="[45, 35, 20]"
+    [lables]="['Ps5', 'Xbox', 'Switch']">
+</app-grafica1>
+<app-grafica1 
+    title="Best All Time Football Player" 
+    [dataArray]="[50, 20, 10, 15, 5]"
+    [lables]="['Messi', 'Maradona', 'Pele', 'Zidane', 'Ronaldinho']">
+</app-grafica1>
+```
+
+
+<img src="./imagenes/01-adminPro-04.png" alt="Diseño Básico" style="margin-right: 10px; max-width: 100%; height: auto; border: 1px solid black" />
+
+
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Servicios, Rutas y persistencia de ajustes:
+
+## ¿Qué veremos en esta sección?
+
+Esta sección tiene varios temas importantes:
+
+- Crearemos un módulo para agrupar todos nuestros servicios
+- Aprenderemos a ejecutar scripts en archivos de JavaScript puros, en TypeScript
+- LocalStorage
+- Cambiar CSS de forma dinámica
+- Crear un componente para los ajustes del tema
+- Tips de JavaScript que se pueden usar en TypeScript
+- Preparar el servicio del Sidebar, el cual usaremos más adelante para crear nuestro menú dinámico en base a las respuestas de nuestro backend server.
+
+
+## Nuevo componente:
+
+Account Settings: 
+
+```bash
+ $ ng g c pages/settings --skip-tests --s
+ ```
+
+ Agregamos este Template:
+
+ ```html
+<!-- Card Wrapper-->
+<h4>Select Theme</h4>
+<div class="r-panel-body">
+    <ul id="themecolors" class="m-t-20">
+        <li><b>Con el sidebar claro</b></li>
+        <li>
+          <li><a 
+            (click)="changeTheme('default')" 
+            data-theme="default" 
+            class="selector default-theme">1</a></li>
+        </li>
+        <!-- Mas temas aca-->
+        <li class="d-block m-t-30"><b>Con el sidebar oscuro</b></li>
+        <li>
+          <a 
+            (click)="changeTheme('default-dark')" 
+            data-theme="default-dark" 
+            class="selector default-dark-theme">7
+          </a>
+        </li>
+        <!-- Mas temas aca-->
+    </ul>
+</div>
+<!-- Card Wrapper-->             
+
+```
+Veremos esto:
+
+<img src="./imagenes/01-adminPro-05.png" alt="Diseño Básico" style="margin-right: 10px; width: 40%; height: auto; border: 1px solid black" />
+
+## Cambiar Tema de forma dinámica
+
+En el inde.html tenemos esto: 
+```html
+<!-- You can change the theme colors from here -->
+<link href="./assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
+```
+
+El objetivo es cambiar dinamicamente este link según el tema seleccionado por el usuario:
+
+```typescript
+export class SettingsComponent implements OnInit{
+  ngOnInit(): void {
+    this.checkCurrentTheme();
+  }
+
+  // these lines avoid hit the DOM multiple times
+  linkTheme?: Element | null = document.querySelector('#theme') ;
+  links = document.querySelectorAll('.selector');
+  
+  changeTheme(theme: string) {
+    const themeUrl = `./assets/css/colors/${ theme }.css`;
+
+    if (this.linkTheme === null) {
+      const newLinkTheme = document.createElement('link');
+      newLinkTheme.setAttribute('id', 'theme');
+      newLinkTheme.setAttribute('rel', 'stylesheet');
+      newLinkTheme.setAttribute('href', themeUrl);
+      document.head.append(newLinkTheme);
+    } else {
+      this.linkTheme!.setAttribute('href', themeUrl);
+    }
+    localStorage.setItem('themeUrl', themeUrl);
+    this.checkCurrentTheme();
+
+  }
+
+  checkCurrentTheme() {
+    this.links.forEach( elem => {
+      elem.classList.remove('working');
+      const btnTheme = elem.getAttribute('data-theme');
+      const btnThemeUrl = `./assets/css/colors/${ btnTheme }.css`;
+      const currentTheme = this.linkTheme?.getAttribute('href') || '';
+
+      if (btnThemeUrl === currentTheme) {
+        elem.classList.add('working');
+      }
+    });
+  }
+}
+
+```
+
+Al guardar en el localStorage el theme seleccionado, ya disponemos de dicha información para establecer el tema al cargar la applicación. Este template usa el tema una vez logeado el usuario, porque el Login y el Register usan su propio estilo. Así que implementaremos esto en el PagesComponent
+
+```typescript
+export class PagesComponent implements OnInit {
+  ngOnInit(): void {
+    const linkTheme = document.querySelector('#theme');
+    const themeUrl = localStorage.getItem('themeUrl') || './assets/css/colors/default.css';
+    linkTheme?.setAttribute('href', themeUrl);
+  }
+}
+```
+
+De esta forma cuando el usuario selecciona un thema se cambia automáticamente y al recargar la aplicación se usa el último tema seleccionado.
+
+
+## Setting Services
+
+Vamos a mover las configuraciones que habiamos colocado en **SettingsComponent** a un servicio
+
+```bash
+$ ng g s services/settings
+```
+
+El componente queda de esta forma:
+
+```typescript
+export class SettingsComponent implements OnInit{
+  
+  constructor(private settingsService: SettingsService) { }
+
+  ngOnInit(): void {
+    this.settingsService.checkCurrentTheme();
+  }
+
+  // Change the theme
+  changeTheme(theme: string) {
+    this.settingsService.changeTheme(theme);
+  }
+}
+```
+
+Y el servicio ahora contiene toda la lógica del Setting template:
+
+```typescript
+export class SettingsService {
+
+  private linkTheme = document.querySelector('#theme');
+  
+  constructor() { 
+    const themeUrl = localStorage.getItem('themeUrl') || './assets/css/colors/default.css';
+    this.linkTheme?.setAttribute('href', themeUrl);
+  }
+
+  changeTheme(theme: string) {
+    const themeUrl = `./assets/css/colors/${ theme }.css`;
+
+    if (this.linkTheme === null) {
+      const newLinkTheme = document.createElement('link');
+      newLinkTheme.setAttribute('id', 'theme');
+      newLinkTheme.setAttribute('rel', 'stylesheet');
+      newLinkTheme.setAttribute('href', themeUrl);
+      document.head.append(newLinkTheme);
+    } else {
+      this.linkTheme!.setAttribute('href', themeUrl);
+    }
+    localStorage.setItem('themeUrl', themeUrl);
+    this.checkCurrentTheme();
+  }
+
+  // Check the current theme
+  checkCurrentTheme() {
+    const links = document.querySelectorAll('.selector');
+    links?.forEach( elem => {
+      elem.classList.remove('working');
+      const btnTheme = elem.getAttribute('data-theme');
+      const btnThemeUrl = `./assets/css/colors/${ btnTheme }.css`;
+      const currentTheme = this.linkTheme?.getAttribute('href') || '';
+
+      if (btnThemeUrl === currentTheme) {
+        elem.classList.add('working');
+      }
+    });
+  }
+}
+```
