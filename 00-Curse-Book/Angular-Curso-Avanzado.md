@@ -1303,3 +1303,91 @@ Y usamos el menú en nuestro template
 }
 ```
 
+## Login Logout y un error de JS
+
+Implementemos el Logout, por ahora solo es la navegación
+
+```html
+<li><a routerLink="/login"><i class="fa fa-power-off"></i> Logout</a></li>
+```
+
+En el Login debemos hacer un par de cosas. Perimero eliminaremos el **Action** y luego agregamos el **submit** de angular
+
+```html
+<form class="form-horizontal form-material" 
+      id="loginform"
+      (submit)="submitLoginForm()">
+```
+
+Deginimos el **submitLoginForm**
+
+```typescript
+export class LoginComponent {
+
+  constructor(private router: Router) { }
+
+  submitLoginForm() {
+    this.router.navigateByUrl('/dashboard');
+  }
+}
+```
+NOTA: Debemos importar el **RouterModule** y **FormsModule**, este último permite a Angular manejar el Submit. 
+
+```typescript
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+  ],
+  exports: []
+})
+export class AuthModule { }
+```
+
+Si navegamos desde Inicio de sesión hasta Panel de control, Angular destruye todo y lo reconstruye nuevamente, hay un custom.js, que inicializa todos los complementos de la plantilla. Esto sólo se llama cuando la página se carga por primera vez. El problema es que cuando recargamos la página después de iniciar sesión, los complementos no se inicializan y muchos enlaces no tienen adjunto el evento requerido, lo que hace que la página se recargue cuando hacemos clic sobre ellos. Al recargar la página los plugins se inicializan correctamente y funcionan bien.
+
+Haremos un cambio en este archivo:
+
+```html
+<script src="./assets/js/custom.min.js"></script>
+```
+
+Cambiemos el **custom.min.js** por el **custom.js** y editemos su contenido.
+
+Todo el contenido del **custom.js** lo vamos a incluir dentro de esta función:
+
+```js
+const customInitFunction = () => {
+  // all custom.js content goes here!!!
+}
+// We call the new function at the end of the file
+customInitFunction();
+```
+
+La idea es encapsular la inicialización de todos los plugins dentro de una función global que pueda llamarse cuando Angular reconstruye nuestro componente principal.
+
+Finalmente usaremos esta función en el PagesComponent, el cual es el Wrapper principal de todos nuestros componentes del Template que usamos
+
+```typescript
+declare function customInitFunction() : void;
+
+@Component({
+  selector: 'app-pages',
+  templateUrl: './pages.component.html',
+  styles: ``
+})
+export class PagesComponent implements OnInit{
+
+constructor(private settingsService: SettingsService) { }
+  ngOnInit(): void {
+    customInitFunction();
+  }
+}
+```
+
+La instrucción `declare function customInitFunction() : void;` le indica a Typescript que tenemos una fn gobal **customInitFunction** definida en alguna parte y que podemos usarla.
+
+De esta forma, al hacer el login, al momento que Angular crea nuevamente el PagesComponent, inicializa todos los plugins del Template.
+
