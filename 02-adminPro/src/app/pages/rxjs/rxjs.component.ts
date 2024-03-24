@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   templateUrl: './rxjs.component.html',
   styleUrl: './rxjs.component.css'
 })
-export class RxjsComponent  implements OnDestroy {
+export class RxjsComponent {
 
   
   constructor() {
@@ -16,7 +16,5 @@ export class RxjsComponent  implements OnDestroy {
       }, 1000 );
     }).subscribe( value => console.log(value) );
   }
-  ngOnDestroy(): void {
-    this.
-  }
+
 }
