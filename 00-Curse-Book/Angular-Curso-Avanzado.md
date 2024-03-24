@@ -1391,3 +1391,37 @@ La instrucción `declare function customInitFunction() : void;` le indica a Type
 
 De esta forma, al hacer el login, al momento que Angular crea nuevamente el PagesComponent, inicializa todos los plugins del Template.
 
+
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Observables y Promesas
+
+## ¿Qué veremos en esta sección?
+
+Esta sección tiene por objetivo principal, trabajar con observables y promesas:
+
+- Tendremos una introducción ilustrativa para explicar estos dos temas
+- Trabajaremos con promesas y funciones que retornan promesas
+- Aprenderemos a crear un observable manualmente
+- Trabajaremos con operadores de los observables como:
+    - Retry
+    - Map
+    - Filter
+    - Next
+- Funciones que retornan observables
+- Usaremos el conocimiento aprendido para crear un componente de seguimiento de la página actual
+- Usaremos observables para leer parámetros de configuración de las rutas que son diferentes a los parámetros de las rutas por url
+- Cambiaremos los metatags dependiendo de la página donde nos encontremos
+- Cambiar el titulo de la página actual
+
+## Observer y Promises
+
+|Promises|Oberver|
+|--------|-------|
+| Trabajan con un único flujo de datos|Flujo continuo de datos|
+|Se usan con una única data asincrona de respuesta|Al fallar pueden ejecutar comandos y reintentar continuar con el Oberservador|
+|No es simple de cancelar|Se pueden encadenar operadores adicionales como el map, foreach|
+||Operadores potentes como el reply o el replay|
+||Pueden ser creados desde otras fuentes como los eventos|
+||Son funciones a las cuales podemos suscribirnos en últiples lugares|
+

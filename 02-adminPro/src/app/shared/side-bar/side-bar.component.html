@@ -32,7 +32,14 @@
                                 </a>
                                 <ul aria-expanded="false" class="collapse">
                                     @for (item of item.submenu; track $index) {
-                                        <li><a routerLink="{{ item.url }}">{{ item.title }}</a></li>
+                                        <li>
+                                            <a 
+                                            routerLinkActive="active"
+                                            [routerLinkActiveOptions]="{exact: true}"
+                                            routerLink="{{ item.url }}">
+                                            {{ item.title }}
+                                            </a>
+                                        </li>
                                     }
                                 </ul>
                             </li>

@@ -12,6 +12,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { Grafica2Component } from './graficas/grafica2/grafica2.component';
 import { GraphHomeComponent } from './graficas/home.component';
 import { SettingsComponent } from './settings/settings.component';
+import { PromisesComponent } from './promises/promises.component';
+import { RxjsComponent } from './rxjs/rxjs.component';
 
 
 @NgModule({
@@ -22,7 +24,9 @@ import { SettingsComponent } from './settings/settings.component';
     PagesComponent,
     Grafica2Component,
     GraphHomeComponent,
-    SettingsComponent
+    SettingsComponent,
+    PromisesComponent,
+    RxjsComponent
   ],
   exports: [
     DashboardComponent,
