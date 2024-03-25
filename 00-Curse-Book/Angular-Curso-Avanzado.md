@@ -1425,3 +1425,162 @@ Esta sección tiene por objetivo principal, trabajar con observables y promesas:
 ||Pueden ser creados desde otras fuentes como los eventos|
 ||Son funciones a las cuales podemos suscribirnos en últiples lugares|
 
+## Ejemplo Básico de una Promesa
+
+El siguiente código imprime:
+
+```
+Fin del init
+Success in promise | Error in promise
+Finally
+```
+
+```typescript
+ngOnInit(): void {
+    const promise = new Promise((resolve, reject) => {
+
+    if (Math.random() > 0.5) {
+      resolve('Success in promise');
+    } else {
+      reject('Error in promise');
+    }
+    }).then((msg) => {
+      console.log(msg); 
+    }).catch((msg) => {
+      console.log(msg);
+    }).finally(() => {
+      console.log('Finally');
+    });
+
+    console.log('Fin del init');
+  }
+```
+
+El mensaje de Success o Error es aleatorio, pero lo importante aca es que el mensaje **Fin del init** se ejecuta primero, ya que el Promise es Async, y luego se imprime el mensaje del Resolve o Reject. El **Finally** se ejecuta siempre independientemente si la promesa generó o no un error.
+
+
+El promise genera un único flujo de datos, aunque colocaramos un setInterval cada 1s, solamente veremos una ejecución del bloque.
+
+```typescript
+setInterval(() => {
+  if (Math.random() > 0.5) {
+    resolve('Success in promise');
+  } else {
+    reject('Error in promise');
+  }
+}, 1000);
+```
+
+
+## Ejemplo Básico de un Observable
+
+```typescript
+constructor() {
+    const observable$ = new Observable( observer => {
+        observer.next('Ping');
+    }).subscribe( value => console.log(value) );
+  }
+```
+
+En este caso el mensaje **Ping** se ejecuta una sola vez, esto se debe a que nuestro observable emite únicamente un evento. Pero si agregamos nuevamente una función con intervalo, similar a:
+
+```typescript
+const interval = setInterval( () => {
+  observer.next('Ping');
+}, 1000 );
+```
+
+En este caso, el observable genera un flujo constante de datos, y veremos cada 1s el mensaje **Ping**
+
+
+## Método Complete
+
+Podemos detener el flujo de datos con el método Complete, el siguiente __Observable__ genera un mensaje cada 1s, al 4to mensage deja de emitir eventos debido a `observer.complete();`
+
+```typescript
+constructor() {
+  let i: number = 0;
+  const observable$ = new Observable( observer => {
+    const interval = setInterval( () => {
+      observer.next('Ping:' + i++);
+      if (i === 4) {
+        clearInterval(interval);
+        observer.complete();
+      }
+    }, 1000 );
+  }).subscribe( value => console.log(value) );
+}
+```
+
+## Método Retry de un Observable
+
+Si en la iteración #2 genera un error, esto termina el flujo de datos 
+
+```typescript
+if (i === 2) {
+  observer.error('Error');
+}
+```
+
+La salida generada sería:
+
+```bash
+Ping:0
+Ping:1
+ERROR Error
+```
+
+NOTA: deberiamos hacer un `clearInterval(interval);` en el error para deneter los ciclos internos del interval.
+
+
+Pero podemos usar el método **Retry** Cambiemos nuestro Observable por esto:
+
+```typescript
+constructor() {
+    let i: number = 0;
+    let numFails: number = 1;
+
+    const observable$ = new Observable( observer => {
+      const interval = setInterval( () => {
+        observer.next('Ping:' + (i++) + ' numFails:' + numFails);
+
+        if (numFails < 2 && i === 2) {
+          clearInterval(interval);
+          observer.error('Error');
+          i = 0;
+          ++numFails;
+        }
+        
+        if (i === 10) {
+          clearInterval(interval);
+          observer.complete();
+        }
+      }, 1000 );
+    })
+    .pipe(
+      retry(2)
+    )
+    .subscribe( value => console.log(value) );
+  }
+```
+
+En este caso introducimos el **retry** y una variable más de control, la salida es:
+
+```bash
+Ping:0 numFails:1
+Ping:1 numFails:1
+# Aca se genera el Error.
+Ping:0 numFails:2
+Ping:1 numFails:2
+Ping:2 numFails:2
+Ping:3 numFails:2
+Ping:4 numFails:2
+Ping:5 numFails:2
+Ping:6 numFails:2
+Ping:7 numFails:2
+Ping:8 numFails:2
+Ping:9 numFails:2
+```
+
+Si queremos generar una salida continua, sin reinicializar el proceso, evitamos el reinicio de i en el bloque de error `i = 0;`
+
