@@ -1231,3 +1231,356 @@ export class SettingsService {
   }
 }
 ```
+
+## Router Link
+
+Cambiemo el sideBar HTML, vamos a usar nuestro nuevo componente. El link siguiente:
+```html
+<li><a href="javascript:void()">Account Setting</a></li>
+```
+
+Lo cambiamos por:
+```html
+<li><a routerLink="/dashboard/settings">Account Setting</a></li>
+```
+
+Para usar el **routerLink** necesitamos importar el **RouterModule** en el Módulo al que pertenece el SideBar, es decir el **ShareModule**.
+
+
+## Servicio para controlar el sideBar
+
+La idea es crear las opciones del sideBar de manera dinámica.
+
+```bash
+$ ng g s services/sidebar --skip-tests
+```
+
+CReamos el servicio
+
+```typescript
+export class SidebarService {
+
+  private menu: MenuImtes[] = [
+    {
+      title: 'Dashboard',
+      icon: 'mdi mdi-gauge',
+      submenu: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Progress Bar', url: 'progress' },
+        { title: 'Gráficas', url: 'graficas' },
+      ]
+    }
+  ];
+
+  constructor() { }
+
+  getMenu(): MenuImtes[] {
+    return this.menu;
+  }
+}
+```
+
+Y usamos el menú en nuestro template
+
+```typescript
+@for (item of menu; track $index) {
+    <li> 
+        <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false">
+            <i class="mdi mdi-gauge"></i>
+            <span class="hide-menu">{{ item.title }}
+                <span 
+                    class="label label-rouded label-themecolor pull-right">
+                    {{ item.submenu.length }}
+                </span>
+            </span>
+        </a>
+        <ul aria-expanded="false" class="collapse">
+            @for (item of item.submenu; track $index) {
+                <li><a routerLink="{{ item.url }}">{{ item.title }}</a></li>
+            }
+        </ul>
+    </li>
+}
+```
+
+## Login Logout y un error de JS
+
+Implementemos el Logout, por ahora solo es la navegación
+
+```html
+<li><a routerLink="/login"><i class="fa fa-power-off"></i> Logout</a></li>
+```
+
+En el Login debemos hacer un par de cosas. Perimero eliminaremos el **Action** y luego agregamos el **submit** de angular
+
+```html
+<form class="form-horizontal form-material" 
+      id="loginform"
+      (submit)="submitLoginForm()">
+```
+
+Deginimos el **submitLoginForm**
+
+```typescript
+export class LoginComponent {
+
+  constructor(private router: Router) { }
+
+  submitLoginForm() {
+    this.router.navigateByUrl('/dashboard');
+  }
+}
+```
+NOTA: Debemos importar el **RouterModule** y **FormsModule**, este último permite a Angular manejar el Submit. 
+
+```typescript
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+  ],
+  exports: []
+})
+export class AuthModule { }
+```
+
+Si navegamos desde Inicio de sesión hasta Panel de control, Angular destruye todo y lo reconstruye nuevamente, hay un custom.js, que inicializa todos los complementos de la plantilla. Esto sólo se llama cuando la página se carga por primera vez. El problema es que cuando recargamos la página después de iniciar sesión, los complementos no se inicializan y muchos enlaces no tienen adjunto el evento requerido, lo que hace que la página se recargue cuando hacemos clic sobre ellos. Al recargar la página los plugins se inicializan correctamente y funcionan bien.
+
+Haremos un cambio en este archivo:
+
+```html
+<script src="./assets/js/custom.min.js"></script>
+```
+
+Cambiemos el **custom.min.js** por el **custom.js** y editemos su contenido.
+
+Todo el contenido del **custom.js** lo vamos a incluir dentro de esta función:
+
+```js
+const customInitFunction = () => {
+  // all custom.js content goes here!!!
+}
+// We call the new function at the end of the file
+customInitFunction();
+```
+
+La idea es encapsular la inicialización de todos los plugins dentro de una función global que pueda llamarse cuando Angular reconstruye nuestro componente principal.
+
+Finalmente usaremos esta función en el PagesComponent, el cual es el Wrapper principal de todos nuestros componentes del Template que usamos
+
+```typescript
+declare function customInitFunction() : void;
+
+@Component({
+  selector: 'app-pages',
+  templateUrl: './pages.component.html',
+  styles: ``
+})
+export class PagesComponent implements OnInit{
+
+constructor(private settingsService: SettingsService) { }
+  ngOnInit(): void {
+    customInitFunction();
+  }
+}
+```
+
+La instrucción `declare function customInitFunction() : void;` le indica a Typescript que tenemos una fn gobal **customInitFunction** definida en alguna parte y que podemos usarla.
+
+De esta forma, al hacer el login, al momento que Angular crea nuevamente el PagesComponent, inicializa todos los plugins del Template.
+
+
+<div style="page-break-after: always;"></div>
+
+# Nueva Sección: Observables y Promesas
+
+## ¿Qué veremos en esta sección?
+
+Esta sección tiene por objetivo principal, trabajar con observables y promesas:
+
+- Tendremos una introducción ilustrativa para explicar estos dos temas
+- Trabajaremos con promesas y funciones que retornan promesas
+- Aprenderemos a crear un observable manualmente
+- Trabajaremos con operadores de los observables como:
+    - Retry
+    - Map
+    - Filter
+    - Next
+- Funciones que retornan observables
+- Usaremos el conocimiento aprendido para crear un componente de seguimiento de la página actual
+- Usaremos observables para leer parámetros de configuración de las rutas que son diferentes a los parámetros de las rutas por url
+- Cambiaremos los metatags dependiendo de la página donde nos encontremos
+- Cambiar el titulo de la página actual
+
+## Observer y Promises
+
+|Promises|Oberver|
+|--------|-------|
+| Trabajan con un único flujo de datos|Flujo continuo de datos|
+|Se usan con una única data asincrona de respuesta|Al fallar pueden ejecutar comandos y reintentar continuar con el Oberservador|
+|No es simple de cancelar|Se pueden encadenar operadores adicionales como el map, foreach|
+||Operadores potentes como el reply o el replay|
+||Pueden ser creados desde otras fuentes como los eventos|
+||Son funciones a las cuales podemos suscribirnos en últiples lugares|
+
+## Ejemplo Básico de una Promesa
+
+El siguiente código imprime:
+
+```
+Fin del init
+Success in promise | Error in promise
+Finally
+```
+
+```typescript
+ngOnInit(): void {
+    const promise = new Promise((resolve, reject) => {
+
+    if (Math.random() > 0.5) {
+      resolve('Success in promise');
+    } else {
+      reject('Error in promise');
+    }
+    }).then((msg) => {
+      console.log(msg); 
+    }).catch((msg) => {
+      console.log(msg);
+    }).finally(() => {
+      console.log('Finally');
+    });
+
+    console.log('Fin del init');
+  }
+```
+
+El mensaje de Success o Error es aleatorio, pero lo importante aca es que el mensaje **Fin del init** se ejecuta primero, ya que el Promise es Async, y luego se imprime el mensaje del Resolve o Reject. El **Finally** se ejecuta siempre independientemente si la promesa generó o no un error.
+
+
+El promise genera un único flujo de datos, aunque colocaramos un setInterval cada 1s, solamente veremos una ejecución del bloque.
+
+```typescript
+setInterval(() => {
+  if (Math.random() > 0.5) {
+    resolve('Success in promise');
+  } else {
+    reject('Error in promise');
+  }
+}, 1000);
+```
+
+
+## Ejemplo Básico de un Observable
+
+```typescript
+constructor() {
+    const observable$ = new Observable( observer => {
+        observer.next('Ping');
+    }).subscribe( value => console.log(value) );
+  }
+```
+
+En este caso el mensaje **Ping** se ejecuta una sola vez, esto se debe a que nuestro observable emite únicamente un evento. Pero si agregamos nuevamente una función con intervalo, similar a:
+
+```typescript
+const interval = setInterval( () => {
+  observer.next('Ping');
+}, 1000 );
+```
+
+En este caso, el observable genera un flujo constante de datos, y veremos cada 1s el mensaje **Ping**
+
+
+## Método Complete
+
+Podemos detener el flujo de datos con el método Complete, el siguiente __Observable__ genera un mensaje cada 1s, al 4to mensage deja de emitir eventos debido a `observer.complete();`
+
+```typescript
+constructor() {
+  let i: number = 0;
+  const observable$ = new Observable( observer => {
+    const interval = setInterval( () => {
+      observer.next('Ping:' + i++);
+      if (i === 4) {
+        clearInterval(interval);
+        observer.complete();
+      }
+    }, 1000 );
+  }).subscribe( value => console.log(value) );
+}
+```
+
+## Método Retry de un Observable
+
+Si en la iteración #2 genera un error, esto termina el flujo de datos 
+
+```typescript
+if (i === 2) {
+  observer.error('Error');
+}
+```
+
+La salida generada sería:
+
+```bash
+Ping:0
+Ping:1
+ERROR Error
+```
+
+NOTA: deberiamos hacer un `clearInterval(interval);` en el error para deneter los ciclos internos del interval.
+
+
+Pero podemos usar el método **Retry** Cambiemos nuestro Observable por esto:
+
+```typescript
+constructor() {
+    let i: number = 0;
+    let numFails: number = 1;
+
+    const observable$ = new Observable( observer => {
+      const interval = setInterval( () => {
+        observer.next('Ping:' + (i++) + ' numFails:' + numFails);
+
+        if (numFails < 2 && i === 2) {
+          clearInterval(interval);
+          observer.error('Error');
+          i = 0;
+          ++numFails;
+        }
+        
+        if (i === 10) {
+          clearInterval(interval);
+          observer.complete();
+        }
+      }, 1000 );
+    })
+    .pipe(
+      retry(2)
+    )
+    .subscribe( value => console.log(value) );
+  }
+```
+
+En este caso introducimos el **retry** y una variable más de control, la salida es:
+
+```bash
+Ping:0 numFails:1
+Ping:1 numFails:1
+# Aca se genera el Error.
+Ping:0 numFails:2
+Ping:1 numFails:2
+Ping:2 numFails:2
+Ping:3 numFails:2
+Ping:4 numFails:2
+Ping:5 numFails:2
+Ping:6 numFails:2
+Ping:7 numFails:2
+Ping:8 numFails:2
+Ping:9 numFails:2
+```
+
+Si queremos generar una salida continua, sin reinicializar el proceso, evitamos el reinicio de i en el bloque de error `i = 0;`
+
