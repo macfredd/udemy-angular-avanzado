@@ -1,19 +1,34 @@
-import { Component } from '@angular/core';
-import { Observable, retry } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscriber, retry } from 'rxjs';
 
 @Component({
   selector: 'app-rxjs',
   templateUrl: './rxjs.component.html',
   styleUrl: './rxjs.component.css'
 })
-export class RxjsComponent {
+export class RxjsComponent implements OnInit, OnDestroy {
+
+  myObservable$?: any;
   
+  constructor() {}
 
-  constructor() {
+  ngOnInit(): void {
+    this.myObservable$ = 
+      this.returnObersvable()
+      .pipe(retry())
+      .subscribe( value => console.log(value) );
+  }
+
+  ngOnDestroy(): void {
+    this.myObservable$!.unsubscribe();
+  }
+
+  returnObersvable(): Observable<string> {
+
     let i: number = 0;
-    let numFails: number = 1;
+    let numFails = 1;
 
-    const observable$ = new Observable( observer => {
+    const observable$ = new Observable<string>( observer => {
       const interval = setInterval( () => {
         observer.next('Ping:' + (i++) + ' numFails:' + numFails);
 
@@ -28,10 +43,8 @@ export class RxjsComponent {
           observer.complete();
         }
       }, 1000 );
-    })
-    .pipe(
-      retry()
-    )
-    .subscribe( value => console.log(value) );
+    });
+
+    return observable$;
   }
 }

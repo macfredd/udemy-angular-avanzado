@@ -1584,3 +1584,27 @@ Ping:9 numFails:2
 
 Si queremos generar una salida continua, sin reinicializar el proceso, evitamos el reinicio de i en el bloque de error `i = 0;`
 
+## Funciones que retorna Observables
+
+POdemos crear una función que retorne un Obserbable:
+
+```typescript
+  returnObersvable(): Observable<string> {}
+```
+
+y luego podemos suscribirnos o desuscribirnos 
+
+```typescript
+myObservable$?: any;
+
+ngOnInit(): void {
+  this.myObservable$ = 
+    this.returnObersvable()
+    .pipe(retry())
+    .subscribe( value => console.log(value) );
+}
+
+ngOnDestroy(): void {
+  this.myObservable$!.unsubscribe();
+}
+```
