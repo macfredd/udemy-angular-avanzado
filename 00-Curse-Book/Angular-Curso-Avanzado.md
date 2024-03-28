@@ -1595,7 +1595,7 @@ POdemos crear una función que retorne un Obserbable:
 y luego podemos suscribirnos o desuscribirnos 
 
 ```typescript
-myObservable$?: any;
+myObservable$?: Subscription;
 
 ngOnInit(): void {
   this.myObservable$ = 
@@ -1608,3 +1608,61 @@ ngOnDestroy(): void {
   this.myObservable$!.unsubscribe();
 }
 ```
+
+## Operador Take y MAP
+
+En la siguiente funcion, se crear un observable con la función **interval** de rxjs, se le indica con el take(4) que deberá emitir hasta 4 valores (señales) y el valor emitido inicialmente (0,1,2,3) se le sumará +1
+
+```typescript
+returnInterval() {
+    return interval(1000).pipe(
+      take(4),
+      map( value => {
+        return value + 1;
+      })
+    );
+  }
+```
+
+el Map se puede usar para limpiar información generada por el Observable.
+
+
+## Operador Filter
+
+Luego del Take(4) podemos agregar una función de FIltro, para tomar únicamente los valores pares
+
+```typescript
+filter( value => value % 2!== 0 ),
+```
+
+Filter, puede ser útil como una función que permita eliminar valores no deseados.
+
+La posición del Filter puede determinar la cantidad de valores finales emitidos, por ejemplo:
+
+
+Esto genera 10 salidas, del 2 al 20, solo números pares 
+
+
+```typescript
+const interval$ = interval(100).pipe(
+  filter( value => value % 2!== 0 ),
+  map( value => { return value + 1; }),
+  take(10)
+);
+```
+
+Mientras tanto, esto, genera 5 salidas, del 2 al 10, solo números pares.
+
+
+```typescript
+const interval$ = interval(100).pipe(
+  take(10),
+  filter( value => value % 2!== 0 ),
+  map( value => { return value + 1; })
+);
+```
+
+En el primer bloque, el filter descarta el 1, por lo tanto no se ejecuta el Take, y ese valor no se cuenta, el siguiente valor es el 2, es par, el filtro lo deja pasar y el take lo cuenta como el primer valor emitido. 
+
+
+

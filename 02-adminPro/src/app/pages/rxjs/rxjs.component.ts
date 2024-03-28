@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscriber, retry } from 'rxjs';
+import { Observable, Subscriber, Subscription, filter, interval, map, retry, take } from 'rxjs';
 
 @Component({
   selector: 'app-rxjs',
@@ -8,19 +8,32 @@ import { Observable, Subscriber, retry } from 'rxjs';
 })
 export class RxjsComponent implements OnInit, OnDestroy {
 
-  myObservable$?: any;
+  myObservable$?: Subscription;
   
   constructor() {}
 
   ngOnInit(): void {
-    this.myObservable$ = 
-      this.returnObersvable()
-      .pipe(retry())
-      .subscribe( value => console.log(value) );
+    // this.myObservable$ = 
+    //   this.returnObersvable()
+    //   .pipe(retry())
+    //   .subscribe( value => console.log(value) );
+
+    this.myObservable$ = this.returnInterval().subscribe( console.log );
   }
 
   ngOnDestroy(): void {
-    this.myObservable$!.unsubscribe();
+    if (this.myObservable$)
+      this.myObservable$!.unsubscribe();
+  }
+
+  returnInterval(): Observable<number> {
+    const interval$ = interval(100).pipe(
+      take(10),
+      filter( value => value % 2!== 0 ),
+      map( value => { return value + 1; })
+    );
+
+    return interval$;
   }
 
   returnObersvable(): Observable<string> {
